@@ -5,6 +5,7 @@ export type Referral = {
   ward: string;
   bed: string;
   referringDepartment: string;
+  referringClinician: string;
   targetDepartment: string;
   notes: string;
   status: string;
