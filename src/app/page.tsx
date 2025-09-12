@@ -8,6 +8,7 @@ import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Chip, Badge,
   useTheme, useMediaQuery, Card, CardContent, CardActions, IconButton
 } from '@mui/material';
+import type { ChipProps } from '@mui/material/Chip';
 import { Referral } from '@/types';
 import NewReferralModal from '@/components/NewReferralModal';
 import ViewReferralModal from '@/components/ViewReferralModal';
@@ -85,8 +86,9 @@ export default function Home() {
   };
 
   const getStatusChip = (status: string) => {
-    const colorMap = { Pending: 'warning', Viewed: 'info', Completed: 'success' };
-    return <Chip label={status} color={colorMap[status as keyof typeof colorMap] || 'default'} size="small" />;
+    const colorMap = { Pending: 'warning', Viewed: 'info', Completed: 'success' } as const;
+    const color: ChipProps['color'] = (colorMap as Record<string, ChipProps['color']>)[status] ?? 'default';
+    return <Chip label={status} color={color} size="small" />;
   };
 
   if (status === 'loading') {
