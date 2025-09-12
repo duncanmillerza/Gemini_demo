@@ -6,7 +6,7 @@ import {
   Modal, Box, Typography, TextField, Button, 
   Select, MenuItem, FormControl, InputLabel, SelectChangeEvent, CircularProgress 
 } from '@mui/material';
-import { Referral } from '@/types';
+import { Referral, NewReferralInput } from '@/types';
 
 const style = {
   position: 'absolute' as const,
@@ -23,7 +23,7 @@ const style = {
 interface NewReferralModalProps {
   open: boolean;
   onClose: () => void;
-  onSave: (referral: Omit<Referral, 'id' | 'status' | 'feedback' | 'createdAt' | 'updatedAt' | 'referringClinician'>) => void;
+  onSave: (referral: NewReferralInput) => void;
   userDepartment: string | undefined;
 }
 
@@ -54,7 +54,7 @@ export default function NewReferralModal({ open, onClose, onSave, userDepartment
   }, [open]);
 
   const handleSubmit = () => {
-    const newReferral = {
+    const newReferral: NewReferralInput = {
       ward,
       bed,
       referringDepartment: userDepartment || '',

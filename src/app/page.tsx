@@ -9,7 +9,7 @@ import {
   useTheme, useMediaQuery, Card, CardContent, CardActions, IconButton
 } from '@mui/material';
 import type { ChipProps } from '@mui/material/Chip';
-import { Referral } from '@/types';
+import { Referral, NewReferralInput } from '@/types';
 import NewReferralModal from '@/components/NewReferralModal';
 import ViewReferralModal from '@/components/ViewReferralModal';
 import { ColorModeContext } from '@/app/components/ThemeRegistry';
@@ -54,7 +54,7 @@ export default function Home() {
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue);
   const handleOpenViewModal = (referral: Referral) => { setSelectedReferral(referral); setIsViewModalOpen(true); };
 
-  const handleSaveNewReferral = async (newReferralData: Omit<Referral, 'id' | 'status' | 'feedback' | 'createdAt' | 'updatedAt' | 'referringClinician'>) => {
+  const handleSaveNewReferral = async (newReferralData: NewReferralInput) => {
     try {
       const res = await fetch('/api/referrals', {
         method: 'POST',
