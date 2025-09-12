@@ -12,8 +12,16 @@ async function getSheetsApi() {
     return sheets;
   }
 
-  const clientEmail = process.env.SHEETS_CLIENT_EMAIL;
-  const rawKey = process.env.SHEETS_PRIVATE_KEY || '';
+  const stripWrappedQuotes = (s: string | undefined | null): string => {
+    const t = (s ?? '').trim();
+    if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+      return t.slice(1, -1);
+    }
+    return t;
+  };
+
+  const clientEmail = stripWrappedQuotes(process.env.SHEETS_CLIENT_EMAIL);
+  const rawKey = stripWrappedQuotes(process.env.SHEETS_PRIVATE_KEY);
   const keyFile = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
   // Normalize private key from common .env formats:
@@ -22,6 +30,8 @@ async function getSheetsApi() {
   // - Base64-encoded PEM (no header present)
   function normalizePrivateKey(input: string): string {
     let key = input.trim();
+    // Normalize CRLF to LF
+    key = key.replace(/\r\n/g, '\n');
     if (!key) return '';
     // Replace escaped newlines first
     if (key.includes('\\n')) key = key.replace(/\\n/g, '\n');
