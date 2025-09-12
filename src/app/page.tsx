@@ -217,8 +217,8 @@ export default function Home() {
         {renderReferralList()}
       </Container>
 
-      <NewReferralModal open={isNewModalOpen} onClose={() => setIsNewModalOpen(false)} onSave={handleSaveNewReferral} userDepartment={MY_DEPARTMENT} />
-      <ViewReferralModal referral={selectedReferral} open={isViewModalOpen} onClose={() => { setIsViewModalOpen(false); setSelectedReferral(null); }} onSave={handleUpdateReferral} userDepartment={MY_DEPARTMENT} activeTab={tabIndex} />
+      <NewReferralModal open={isNewModalOpen} onClose={() => setIsNewModalOpen(false)} onSave={handleSaveNewReferral} userDepartment={MY_DEPARTMENT ?? undefined} />
+      <ViewReferralModal referral={selectedReferral} open={isViewModalOpen} onClose={() => { setIsViewModalOpen(false); setSelectedReferral(null); }} onSave={handleUpdateReferral} userDepartment={MY_DEPARTMENT ?? undefined} activeTab={tabIndex} />
     </div>
   );
 }
