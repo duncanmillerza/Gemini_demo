@@ -33,6 +33,14 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# service account keys (never commit)
+*.service-account.json
+expanded-goal-*-*.json
+
+# local credentials (do not commit service account keys)
+expanded-goal-471714-s6-cd6d5a5882f82.json
+*service-account*.json
+
 # vercel
 .vercel
 
