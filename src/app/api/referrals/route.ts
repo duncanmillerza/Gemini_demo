@@ -3,9 +3,8 @@ import { NextResponse } from 'next/server';
 import { getRows, appendRow, updateRow } from '@/lib/sheets';
 import { Referral } from '@/types';
 import { getServerSession } from "next-auth/next"
-
-// Import NextAuth options to validate sessions server-side
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+// Import NextAuth options from shared module
+import { authOptions } from '@/lib/authOptions'
 
 export async function GET() {
   try {
