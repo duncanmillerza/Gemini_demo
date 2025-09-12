@@ -17,11 +17,11 @@ export const authOptions: NextAuthOptions = {
       return !!user;
     },
     async jwt({ token }) {
-      if (token.email && !(token as any).department) {
+      if (token.email && !token.department) {
         const user = await getUserByEmail(token.email);
         if (user) {
           token.name = user.name;
-          (token as any).department = user.department;
+          token.department = user.department;
         }
       }
       return token;
@@ -29,11 +29,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         if (typeof token.name === "string") session.user.name = token.name;
-        const dept = (token as any).department;
+        const dept = token.department;
         if (typeof dept === "string") session.user.department = dept;
       }
       return session;
     },
   },
 };
-
