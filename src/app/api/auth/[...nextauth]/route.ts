@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
       const user = await getUserByEmail(profile.email);
       return !!user; // Return true if user is not null, false otherwise
     },
-    async jwt({ token, profile }) {
+    async jwt({ token }) {
       // If the user's department is not yet in the token, fetch it.
       if (token.email && !token.department) {
         const user = await getUserByEmail(token.email);
@@ -33,8 +33,9 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       // Add custom properties from the token to the session.
       if (session.user) {
-        (session.user as any).name = token.name;
-        (session.user as any).department = token.department;
+        // Types are augmented in src/types/next-auth.d.ts
+        if (typeof token.name === "string") session.user.name = token.name;
+        if (typeof token.department === "string") session.user.department = token.department;
       }
       return session;
     },

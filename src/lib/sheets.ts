@@ -1,7 +1,7 @@
-import { google } from 'googleapis';
+import { google, sheets_v4 } from 'googleapis';
 
 // A cache for the Google Sheets API object to avoid re-creating it on every request
-let sheets: any;
+let sheets: sheets_v4.Sheets | null;
 
 /**
  * Authenticates with the Google Sheets API and returns a Sheets API object.
@@ -44,7 +44,7 @@ async function getSheetsApi() {
       keyFile,
     });
     const authClient = await auth.getClient();
-    sheets = google.sheets({ version: 'v4', auth: authClient as any });
+    sheets = google.sheets({ version: 'v4', auth: authClient });
     return sheets;
   }
 
@@ -68,7 +68,7 @@ async function getSheetsApi() {
   });
 
   const authClient = await auth.getClient();
-  sheets = google.sheets({ version: 'v4', auth: authClient as any });
+  sheets = google.sheets({ version: 'v4', auth: authClient });
   return sheets;
 }
 

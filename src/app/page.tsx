@@ -29,7 +29,7 @@ export default function Home() {
   const colorMode = useContext(ColorModeContext);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const MY_DEPARTMENT = (session?.user as any)?.department;
+  const MY_DEPARTMENT = session?.user?.department;
 
   const fetchReferrals = async () => {
     try {
@@ -39,7 +39,11 @@ export default function Home() {
       const data: Referral[] = await res.json();
       setReferrals(data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       setError(null);
-    } catch (e: any) { setError(e.message); } finally { setLoading(false); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -59,7 +63,9 @@ export default function Home() {
       if (!res.ok) throw new Error('Failed to create referral');
       setIsNewModalOpen(false);
       fetchReferrals();
-    } catch (e: any) { setError(e.message); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   };
 
   const handleUpdateReferral = async (updatedReferral: Referral) => {
@@ -73,7 +79,9 @@ export default function Home() {
       setIsViewModalOpen(false);
       setSelectedReferral(null);
       fetchReferrals();
-    } catch (e: any) { setError(e.message); }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
   };
 
   const getStatusChip = (status: string) => {
