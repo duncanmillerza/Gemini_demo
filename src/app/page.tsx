@@ -11,6 +11,7 @@ import type { ChipProps } from '@mui/material/Chip';
 import { Referral, NewReferralInput } from '@/types';
 import NewReferralModal from '@/components/NewReferralModal';
 import ViewReferralModal from '@/components/ViewReferralModal';
+import UserOnboarding from '@/components/UserOnboarding';
 import { ColorModeContext } from '@/app/components/ThemeRegistry';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -27,12 +28,37 @@ export default function Home() {
   const [isNewModalOpen, setIsNewModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedReferral, setSelectedReferral] = useState<Referral | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [userNeedsOnboarding, setUserNeedsOnboarding] = useState(false);
 
   const theme = useTheme();
   const colorMode = useContext(ColorModeContext);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const MY_DEPARTMENT = (session?.user as any)?.department;
+
+  const checkUserRegistration = async () => {
+    if (!session?.user?.email) return;
+    
+    try {
+      const res = await fetch(`/api/users?email=${encodeURIComponent(session.user.email)}`);
+      if (res.status === 404) {
+        // User not found in sheets, needs onboarding
+        setUserNeedsOnboarding(true);
+        setShowOnboarding(true);
+        setLoading(false);
+        return;
+      }
+      if (!res.ok) throw new Error('Failed to check user registration');
+      
+      // User exists, proceed to fetch referrals
+      setUserNeedsOnboarding(false);
+      fetchReferrals();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
+      setLoading(false);
+    }
+  };
 
   const fetchReferrals = async () => {
     try {
@@ -50,7 +76,9 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (status === 'authenticated') fetchReferrals();
+    if (status === 'authenticated') {
+      checkUserRegistration();
+    }
   }, [status]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue);
@@ -85,6 +113,13 @@ export default function Home() {
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));
     }
+  };
+
+  const handleOnboardingComplete = (userData: { email: string; name: string; department: string }) => {
+    setShowOnboarding(false);
+    setUserNeedsOnboarding(false);
+    // Refresh the page to reload with updated user data
+    window.location.reload();
   };
 
   const getStatusChip = (status: string) => {
@@ -123,20 +158,51 @@ export default function Home() {
               Referral System
             </Typography>
             <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
-              Please sign in to access the referral system
+              Sign in with Google to get started. New users will be guided through a quick setup process.
             </Typography>
             <Button 
               variant="contained" 
               size="large"
               fullWidth
               onClick={() => signIn('google')}
-              sx={{ py: 1.5 }}
+              sx={{ py: 1.5, mb: 2 }}
             >
               Sign in with Google
+            </Button>
+            <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
+              For demo purposes
+            </Typography>
+            <Button 
+              variant="outlined" 
+              size="small"
+              fullWidth
+              onClick={() => {
+                setShowOnboarding(true);
+                setUserNeedsOnboarding(true);
+              }}
+              sx={{ py: 1 }}
+            >
+              Preview Registration Flow
             </Button>
           </Card>
         </Fade>
       </Box>
+    );
+  }
+
+  // Show onboarding for new users
+  if (showOnboarding && userNeedsOnboarding) {
+    return (
+      <>
+        <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }} />
+        <UserOnboarding
+          open={showOnboarding}
+          userEmail={session?.user?.email || ''}
+          userName={session?.user?.name || ''}
+          onComplete={handleOnboardingComplete}
+          onClose={() => setShowOnboarding(false)}
+        />
+      </>
     );
   }
 

@@ -150,9 +150,36 @@ async function _getAllDepartments() {
   return uniqueDepartments;
 }
 
+/**
+ * Adds a new user to the "Users" sheet.
+ */
+async function _createUser(email: string, name: string, department: string) {
+  const sheetsApi = await getSheetsApi();
+  const spreadsheetId = process.env.GOOGLE_SHEET_ID as string;
+  if (!spreadsheetId) {
+    throw new Error('Missing GOOGLE_SHEET_ID');
+  }
+  
+  await sheetsApi.spreadsheets.values.append({
+    spreadsheetId,
+    range: 'Users!A1',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[email, name, department]],
+    },
+  });
+  
+  return {
+    email,
+    name,
+    department,
+  };
+}
+
 
 export const getRows = _getRows;
 export const appendRow = _appendRow;
 export const updateRow = _updateRow;
 export const getUserByEmail = _getUserByEmail;
 export const getAllDepartments = _getAllDepartments;
+export const createUser = _createUser;
