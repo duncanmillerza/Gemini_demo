@@ -38,12 +38,16 @@ export default function Home() {
   const MY_DEPARTMENT = (session?.user as any)?.department;
 
   const checkUserRegistration = async () => {
+    console.log('🔍 checkUserRegistration called', { email: session?.user?.email });
     if (!session?.user?.email) return;
     
     try {
       const res = await fetch(`/api/users?email=${encodeURIComponent(session.user.email)}`);
+      console.log('📡 User check response:', { status: res.status, ok: res.ok });
+      
       if (res.status === 404) {
         // User not found in sheets, needs onboarding
+        console.log('❌ User not found, setting up onboarding');
         setUserNeedsOnboarding(true);
         setShowOnboarding(true);
         setLoading(false);
@@ -52,9 +56,11 @@ export default function Home() {
       if (!res.ok) throw new Error('Failed to check user registration');
       
       // User exists, proceed to fetch referrals
+      console.log('✅ User found, proceeding to fetch referrals');
       setUserNeedsOnboarding(false);
       fetchReferrals();
     } catch (e: unknown) {
+      console.error('💥 Error in checkUserRegistration:', e);
       setError(e instanceof Error ? e.message : String(e));
       setLoading(false);
     }
@@ -76,10 +82,21 @@ export default function Home() {
   };
 
   useEffect(() => {
+    console.log('🔄 Auth status changed:', { status, email: session?.user?.email });
     if (status === 'authenticated') {
       checkUserRegistration();
     }
   }, [status]);
+
+  // Debug state changes
+  useEffect(() => {
+    console.log('🎭 State update:', { 
+      showOnboarding, 
+      userNeedsOnboarding, 
+      loading,
+      status
+    });
+  }, [showOnboarding, userNeedsOnboarding, loading, status]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => setTabIndex(newValue);
   const handleOpenViewModal = (referral: Referral) => { setSelectedReferral(referral); setIsViewModalOpen(true); };
@@ -192,18 +209,25 @@ export default function Home() {
     );
   }
 
-  // Show onboarding for new users or demo
-  if (showOnboarding) {
+  // Show onboarding for new users who actually need it (not demo)
+  if (showOnboarding && userNeedsOnboarding) {
+    console.log('🎭 Rendering onboarding for new user', { 
+      showOnboarding, 
+      userNeedsOnboarding 
+    });
     return (
       <>
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }} />
         <UserOnboarding
           open={showOnboarding}
-          userEmail={session?.user?.email || 'demo@example.com'}
-          userName={session?.user?.name || 'Demo User'}
+          userEmail={session?.user?.email || ''}
+          userName={session?.user?.name || ''}
           onComplete={handleOnboardingComplete}
-          onClose={() => setShowOnboarding(false)}
-          demoMode={!userNeedsOnboarding}
+          onClose={() => {
+            console.log('🚪 Onboarding modal closed');
+            setShowOnboarding(false);
+          }}
+          demoMode={false}
         />
       </>
     );
@@ -489,7 +513,11 @@ export default function Home() {
               <Button 
                 variant="outlined" 
                 size="small"
-                onClick={() => setShowOnboarding(true)}
+                onClick={() => {
+                  console.log('🖱️ Demo Registration button clicked');
+                  setShowOnboarding(true);
+                  console.log('✅ setShowOnboarding(true) called');
+                }}
                 sx={{ 
                   borderRadius: 2,
                   px: 2,
@@ -531,6 +559,19 @@ export default function Home() {
         onSave={handleUpdateReferral} 
         userDepartment={MY_DEPARTMENT ?? undefined} 
         activeTab={tabIndex} 
+      />
+      
+      {/* Demo Onboarding Modal */}
+      <UserOnboarding
+        open={showOnboarding && !userNeedsOnboarding}
+        userEmail="demo@example.com"
+        userName="Demo User"
+        onComplete={handleOnboardingComplete}
+        onClose={() => {
+          console.log('🚪 Demo onboarding modal closed');
+          setShowOnboarding(false);
+        }}
+        demoMode={true}
       />
     </Box>
   );
