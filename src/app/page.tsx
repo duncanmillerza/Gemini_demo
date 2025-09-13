@@ -196,8 +196,10 @@ export default function Home() {
               size="small"
               fullWidth
               onClick={() => {
+                console.log('🎬 Preview Registration Flow clicked');
                 setShowOnboarding(true);
-                setUserNeedsOnboarding(true);
+                setUserNeedsOnboarding(false); // This is demo mode, not real user onboarding
+                console.log('✅ Set showOnboarding=true, userNeedsOnboarding=false for demo');
               }}
               sx={{ py: 1 }}
             >
@@ -205,6 +207,19 @@ export default function Home() {
             </Button>
           </Card>
         </Fade>
+        
+        {/* Demo Onboarding Modal for unauthenticated users */}
+        <UserOnboarding
+          open={showOnboarding && !userNeedsOnboarding}
+          userEmail="demo@example.com"
+          userName="Demo User"
+          onComplete={handleOnboardingComplete}
+          onClose={() => {
+            console.log('🚪 Demo onboarding modal closed (unauthenticated)');
+            setShowOnboarding(false);
+          }}
+          demoMode={true}
+        />
       </Box>
     );
   }
