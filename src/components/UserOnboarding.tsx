@@ -58,7 +58,6 @@ const commonDepartments = [
 ];
 
 export default function UserOnboarding({ open, userEmail, userName, onComplete, onClose, demoMode = false }: UserOnboardingProps) {
-  console.log('🏗️ UserOnboarding component rendered', { open, userEmail, userName, demoMode });
   
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -212,8 +211,14 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
                 required
                 type="email"
                 variant="outlined"
-                disabled={!!userEmail}
-                helperText={userEmail ? "Email from your Google account" : ""}
+                disabled={!!userEmail && !demoMode}
+                helperText={
+                  demoMode 
+                    ? "Enter any email address for demonstration" 
+                    : userEmail 
+                      ? "Email from your Google account" 
+                      : ""
+                }
               />
             </Box>
           </Fade>
@@ -271,8 +276,6 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
         return null;
     }
   };
-
-  console.log('🎪 UserOnboarding render decision', { open, activeStep });
 
   return (
     <Dialog 
