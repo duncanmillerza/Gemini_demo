@@ -1,4 +1,3 @@
-
 import { google, sheets_v4 } from 'googleapis';
 
 // A cache for the Google Sheets API object to avoid re-creating it on every request
@@ -13,12 +12,27 @@ async function getSheetsApi() {
     return sheets;
   }
 
-  // Use the keyFile method for robust credential loading
-  const keyFile = './google-service-account.json'; // Path to your service account JSON file
+  // Use the environment variable for credentials JSON
+  const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+
+  if (!credentialsJson) {
+    throw new Error('Missing GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable.');
+  }
+
+  // Parse the JSON string into an object
+  let credentials: { client_email: string; private_key: string; };
+  try {
+    credentials = JSON.parse(credentialsJson);
+  } catch (e) {
+    throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format.' + e);
+  }
 
   const auth = new google.auth.GoogleAuth({
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    keyFile: keyFile,
+    credentials: {
+      client_email: credentials.client_email,
+      private_key: credentials.private_key,
+    },
   });
 
   const authClient = await auth.getClient();
