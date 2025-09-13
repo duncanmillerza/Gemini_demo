@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
@@ -30,7 +29,7 @@ export default function Home() {
   const colorMode = useContext(ColorModeContext);
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const MY_DEPARTMENT = session?.user?.department;
+  const MY_DEPARTMENT = (session?.user as any)?.department;
 
   const fetchReferrals = async () => {
     try {
@@ -126,16 +125,16 @@ export default function Home() {
       return (
         <Box>
           {filteredReferrals.map((referral) => (
-            <Card key={referral.id} sx={{ mb: 2 }}>
+            <Card key={referral.id} sx={{ mb: 2, bgcolor: 'background.paper' }}>
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
                   <Typography variant="h6">{referral.ward} - Bed {referral.bed}</Typography>
                   {getStatusChip(referral.status)}
                 </Box>
-                <Typography color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   {tabIndex === 0 ? `From: ${referral.referringDepartment}` : `To: ${referral.targetDepartment}`}
                 </Typography>
-                <Typography color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   Date: {referral.createdAt ? new Date(referral.createdAt).toLocaleDateString() : 'N/A'}
                 </Typography>
               </CardContent>
@@ -149,7 +148,7 @@ export default function Home() {
     }
 
     return (
-      <Paper>
+      <Paper sx={{ bgcolor: 'background.paper' }}>
         <TableContainer>
           <Table>
             <TableHead>
@@ -181,8 +180,8 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <AppBar position="static">
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+      <AppBar position="static" elevation={0}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             Referrals
@@ -219,6 +218,6 @@ export default function Home() {
 
       <NewReferralModal open={isNewModalOpen} onClose={() => setIsNewModalOpen(false)} onSave={handleSaveNewReferral} userDepartment={MY_DEPARTMENT ?? undefined} />
       <ViewReferralModal referral={selectedReferral} open={isViewModalOpen} onClose={() => { setIsViewModalOpen(false); setSelectedReferral(null); }} onSave={handleUpdateReferral} userDepartment={MY_DEPARTMENT ?? undefined} activeTab={tabIndex} />
-    </div>
+    </Box>
   );
 }
