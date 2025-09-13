@@ -47,3 +47,6 @@ expanded-goal-471714-s6-cd6d5a5882f82.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Google Service Account Key
+google-service-account.json

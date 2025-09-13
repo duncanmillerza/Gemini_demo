@@ -18,5 +18,5 @@ export type Referral = {
 // Minimal payload required when creating a new referral from the client
 export type NewReferralInput = Pick<
   Referral,
-  'ward' | 'bed' | 'referringDepartment' | 'targetDepartment' | 'notes'
+  'ward' | 'bed' | 'targetDepartment' | 'notes'
 >;

@@ -64,11 +64,11 @@ export default function ViewReferralModal({ referral, open, onClose, onSave, use
         </Typography>
         
         <Grid container spacing={2}>
-          <Grid item xs={6}><Typography variant="body2"><strong>From:</strong> {referral.referringDepartment} ({referral.referringClinician})</Typography></Grid>
-          <Grid item xs={6}><Typography variant="body2"><strong>To:</strong> {referral.targetDepartment}</Typography></Grid>
-          <Grid item xs={6}><Typography variant="body2"><strong>Ward:</strong> {referral.ward}</Typography></Grid>
-          <Grid item xs={6}><Typography variant="body2"><strong>Bed:</strong> {referral.bed}</Typography></Grid>
-          <Grid item xs={12}><Typography variant="body2"><strong>Status:</strong> {referral.status}</Typography></Grid>
+          <Grid xs={6}><Typography variant="body2"><strong>From:</strong> {referral.referringDepartment} ({referral.referringClinician})</Typography></Grid>
+          <Grid xs={6}><Typography variant="body2"><strong>To:</strong> {referral.targetDepartment}</Typography></Grid>
+          <Grid xs={6}><Typography variant="body2"><strong>Ward:</strong> {referral.ward}</Typography></Grid>
+          <Grid xs={6}><Typography variant="body2"><strong>Bed:</strong> {referral.bed}</Typography></Grid>
+          <Grid xs={12}><Typography variant="body2"><strong>Status:</strong> {referral.status}</Typography></Grid>
         </Grid>
 
         <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>

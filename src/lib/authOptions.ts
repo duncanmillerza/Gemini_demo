@@ -1,6 +1,14 @@
-import { type NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { getUserByEmail } from "@/lib/sheets";
+
+// This object now maps user emails to their department.
+// Add your test users and their departments here.
+const userDatabase: { [email: string]: string } = {
+    "duncanmillerza@gmail.com": "Cardiology",
+    "another.user@gmail.com": "Neurology",
+    "a.third.user@domain.com": "Oncology"
+};
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,11 +20,18 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ profile }) {
-      if (!profile?.email) return false;
+      if (!profile?.email) {
+        return false; // Can't sign in without an email
+      }
+      // Check if the user exists in our "Users" Google Sheet
       const user = await getUserByEmail(profile.email);
-      return !!user;
+      if (user) {
+        return true; // Allow sign-in
+      }
+      return false; // Block sign-in for anyone not in the Users sheet
     },
-    async jwt({ token }) {
+    async jwt({ token, profile }) {
+      // If the user's department is not yet in the token, fetch it.
       if (token.email && !token.department) {
         const user = await getUserByEmail(token.email);
         if (user) {
@@ -27,10 +42,10 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
+      // Add the custom properties from the token to the session object
       if (session.user) {
-        if (typeof token.name === "string") session.user.name = token.name;
-        const dept = token.department;
-        if (typeof dept === "string") session.user.department = dept;
+        (session.user as any).name = token.name;
+        (session.user as any).department = token.department;
       }
       return session;
     },

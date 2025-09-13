@@ -57,7 +57,6 @@ export default function NewReferralModal({ open, onClose, onSave, userDepartment
     const newReferral: NewReferralInput = {
       ward,
       bed,
-      referringDepartment: userDepartment || '',
       targetDepartment,
       notes,
     };
