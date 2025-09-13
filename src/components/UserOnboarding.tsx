@@ -29,6 +29,7 @@ interface UserOnboardingProps {
   userName: string;
   onComplete: (userData: { email: string; name: string; department: string }) => void;
   onClose: () => void;
+  demoMode?: boolean;
 }
 
 const commonDepartments = [
@@ -56,7 +57,7 @@ const commonDepartments = [
   'Administration',
 ];
 
-export default function UserOnboarding({ open, userEmail, userName, onComplete, onClose }: UserOnboardingProps) {
+export default function UserOnboarding({ open, userEmail, userName, onComplete, onClose, demoMode = false }: UserOnboardingProps) {
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     name: userName || '',
@@ -118,25 +119,35 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
     setError(null);
 
     try {
-      const response = await fetch('/api/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      if (demoMode) {
+        // For demo mode, just simulate the flow without actual API call
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+        setActiveStep(3); // Move to completion step
+        
+        setTimeout(() => {
+          onComplete(formData);
+        }, 2000);
+      } else {
+        const response = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to register user');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to register user');
+        }
+
+        const userData = await response.json();
+        setActiveStep(3); // Move to completion step
+        
+        setTimeout(() => {
+          onComplete(userData);
+        }, 2000);
       }
-
-      const userData = await response.json();
-      setActiveStep(3); // Move to completion step
-      
-      setTimeout(() => {
-        onComplete(userData);
-      }, 2000);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to register user');
     } finally {
@@ -155,8 +166,21 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
                 Welcome to Referral System
               </Typography>
               <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400, mx: 'auto' }}>
-                Let's set up your profile so you can start managing referrals with your team.
+                {demoMode ? 'This is a demonstration of the registration flow for new users.' : 'Let\'s set up your profile so you can start managing referrals with your team.'}
               </Typography>
+              {demoMode && (
+                <Typography variant="caption" sx={{ 
+                  display: 'inline-block',
+                  backgroundColor: 'warning.light',
+                  color: 'warning.contrastText',
+                  px: 1,
+                  py: 0.5,
+                  borderRadius: 1,
+                  mb: 2
+                }}>
+                  DEMO MODE
+                </Typography>
+              )}
             </Box>
           </Fade>
         );

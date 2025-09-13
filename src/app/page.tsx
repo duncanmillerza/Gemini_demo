@@ -118,8 +118,10 @@ export default function Home() {
   const handleOnboardingComplete = (userData: { email: string; name: string; department: string }) => {
     setShowOnboarding(false);
     setUserNeedsOnboarding(false);
-    // Refresh the page to reload with updated user data
-    window.location.reload();
+    // Only refresh if it's not a demo and user actually needs onboarding
+    if (userNeedsOnboarding && status === 'authenticated') {
+      window.location.reload();
+    }
   };
 
   const getStatusChip = (status: string) => {
@@ -190,17 +192,18 @@ export default function Home() {
     );
   }
 
-  // Show onboarding for new users
-  if (showOnboarding && userNeedsOnboarding) {
+  // Show onboarding for new users or demo
+  if (showOnboarding) {
     return (
       <>
         <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }} />
         <UserOnboarding
           open={showOnboarding}
-          userEmail={session?.user?.email || ''}
-          userName={session?.user?.name || ''}
+          userEmail={session?.user?.email || 'demo@example.com'}
+          userName={session?.user?.name || 'Demo User'}
           onComplete={handleOnboardingComplete}
           onClose={() => setShowOnboarding(false)}
+          demoMode={!userNeedsOnboarding}
         />
       </>
     );
@@ -482,18 +485,33 @@ export default function Home() {
                tabIndex === 1 ? 'Sent Referrals' :
                tabIndex === 2 ? 'Pending Feedback' : 'Completed Referrals'}
             </Typography>
-            <Button 
-              variant="contained" 
-              startIcon={<AddIcon />}
-              onClick={() => setIsNewModalOpen(true)}
-              sx={{ 
-                borderRadius: 2,
-                px: 3,
-                py: 1,
-              }}
-            >
-              New Referral
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button 
+                variant="outlined" 
+                size="small"
+                onClick={() => setShowOnboarding(true)}
+                sx={{ 
+                  borderRadius: 2,
+                  px: 2,
+                  py: 0.5,
+                  fontSize: '0.75rem'
+                }}
+              >
+                Demo Registration
+              </Button>
+              <Button 
+                variant="contained" 
+                startIcon={<AddIcon />}
+                onClick={() => setIsNewModalOpen(true)}
+                sx={{ 
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                }}
+              >
+                New Referral
+              </Button>
+            </Box>
           </Box>
         </Box>
         
