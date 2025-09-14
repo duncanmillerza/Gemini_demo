@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
     // Check if user already exists
     const existingUser = await getUserByEmail(email);
     if (existingUser) {
-      return NextResponse.json(
-        { error: 'User already exists' },
-        { status: 409 }
-      );
+      // For demo purposes, we can allow "updating" the existing user
+      // by returning the existing user data instead of an error
+      console.log('User already exists, returning existing data for demo:', existingUser);
+      return NextResponse.json(existingUser, { status: 200 });
     }
 
     // Create new user

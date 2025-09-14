@@ -120,35 +120,26 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
     setError(null);
 
     try {
-      if (demoMode) {
-        // For demo mode, just simulate the flow without actual API call
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-        setActiveStep(3); // Move to completion step
-        
-        setTimeout(() => {
-          onComplete(formData);
-        }, 2000);
-      } else {
-        const response = await fetch('/api/users/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(formData),
-        });
+      // Both demo mode and real mode now save to Google Sheets
+      const response = await fetch('/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to register user');
-        }
-
-        const userData = await response.json();
-        setActiveStep(3); // Move to completion step
-        
-        setTimeout(() => {
-          onComplete(userData);
-        }, 2000);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to register user');
       }
+
+      const userData = await response.json();
+      setActiveStep(3); // Move to completion step
+      
+      setTimeout(() => {
+        onComplete(userData);
+      }, 2000);
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to register user');
     } finally {
@@ -265,9 +256,17 @@ export default function UserOnboarding({ open, userEmail, userName, onComplete, 
               <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
                 Welcome to the referral system, {formData.name}!
               </Typography>
-              <Typography variant="body2" color="text.secondary">
-                You'll be redirected to the dashboard in a moment...
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                {demoMode 
+                  ? 'Your demo data has been saved to Google Sheets for demonstration purposes.'
+                  : 'You\'ll be redirected to the dashboard in a moment...'
+                }
               </Typography>
+              {demoMode && (
+                <Typography variant="body2" color="text.secondary">
+                  Check the Users tab in your Google Sheet to see the new entry!
+                </Typography>
+              )}
             </Box>
           </Fade>
         );
